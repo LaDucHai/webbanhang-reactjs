@@ -1,0 +1,33 @@
+.Header {
+    flex-direction: row;
+    display: flex;
+    margin-top: 0px;
+}
+
+.HeaderComponent {
+    margin: 10px;
+}
+
+.HeaderComponent:hover {
+    background-color: #d7dae3;
+    border-radius: 5px;
+}
+
+/* ip12-pro: max with 390px*/
+@media only screen and (max-width: 400px) {
+
+}
+
+/* samsung galaxy A51/71: 412px*/
+@media only screen and (max-width: 500px) {
+    /* .HeaderComponent {
+        margin: 15px;
+    } */
+
+    .Header {
+        flex-direction: row;
+        display: flex;
+        margin-top: 0px;
+        justify-content: flex-start;
+    }
+}
