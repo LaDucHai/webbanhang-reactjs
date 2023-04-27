@@ -3,6 +3,7 @@
     /* height: 100%; */
     /* width: 100vw;
     height: 100vh; */
+    /* width: 100vh; */
 }
 
 .headerProduct {
@@ -60,7 +61,7 @@
 }
 
 .detailProduct {
-    background-color: yellow;
+    background-color: white;
     width: 20%;
     height: 50%;
     position: sticky;
@@ -74,4 +75,37 @@
     height: 100px;
     resize: none;
     outline: none;
+}
+
+/* samsung galaxy A51/71: 412px*/
+@media only screen and (max-width: 500px) {
+    .Product {
+        background-color: #d7dae3;
+        width: 100%;
+        height: 100%;
+    }
+
+    .Product > div {
+        width: 100%;
+    }
+
+    .productContainer {
+        display: flex;
+        justify-content: space-around;
+        height: 100%;
+        width: 100%;
+    }
+    
+    .smartSearch {
+        display: none;
+    }
+
+    .detailProduct {
+        display: none;
+    }
+
+    .loadSearch {
+        width: 100%;
+        height: 100%;
+    }
 }

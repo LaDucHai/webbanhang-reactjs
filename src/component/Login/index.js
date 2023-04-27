@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 import { SERVERADDRESS } from '../../utils/Constant';
+import { valid_Vietkey, valid_Capital, valid_SpecialChar, vali_Space } from '../../utils/Common';
+import { setCompanyInfor, setUserInfor } from '../../utils/Common';
 
 /** 
 *@typedef {
@@ -53,17 +55,37 @@ const Login = () => {
             // if login successly, save token here
             if (res.data.loginState) {
                 window.localStorage.setItem('token webbanhang', res.data.token.tokenLogin);
+                setCompanyInfor();
+                setUserInfor();
                 setNote('Đăng nhập thành công');
                 loginState.current = true;
             } else {
                 setNote('Tài khoản hoặc mật khẩu không chính xác');
             }
             
-        }).catch(err => console.error(err));
+        }).catch(err => {
+            console.error(err);
+        }).finally(() => {
+            window.location.reload();
+        })
     }
     
     const inputClick = (id) => {       
         document.getElementById(`${id}`).style.border = "1px solid black";
+    }
+
+    const handleString = (id) => {
+        setNote('');
+        verifySuccess.current = true;
+        const value = document.getElementById(id).value;
+        valid_Vietkey(value) && (verifySuccess.current = false);
+        valid_Capital(value) && (verifySuccess.current = false);
+        valid_SpecialChar(value) && (verifySuccess.current = false);
+        vali_Space(value) && (verifySuccess.current = false);
+        if (!verifySuccess.current) {
+            document.getElementById(id).style.border = "4px solid red";
+            setNote('Không sử dụng ký tự có dấu, chữ viết hoa, ký tự đặc biệt và khoảng trống');
+        }
     }
 
     return (
@@ -71,8 +93,8 @@ const Login = () => {
         ?
         <div className="Login">
             <div>  
-                <input onClick={() => inputClick('account')} className='input' id='account' placeholder='tài khoản'/>
-                <input onClick={() => inputClick('password')} className='input' id='password' placeholder='mật khẩu' />
+                <input onClick={() => inputClick('account')} className='input' id='account' placeholder='tài khoản' onChange={() => handleString('account')} />
+                <input onClick={() => inputClick('password')} className='input' id='password' placeholder='mật khẩu' onChange={() => handleString('password')} />
             </div>
             <div className='btnContainer'>
                 <button onClick={() => oke_login()} className='btn btnLogin'>Đăng nhập</button>

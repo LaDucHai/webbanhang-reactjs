@@ -3,7 +3,7 @@ import './App.css';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { getUserInfor, getCompanyInfor } from './utils/Common/index';
+import { setUserInfor, setCompanyInfor } from './utils/Common/index';
 
 import Home from './component/Home';
 import Product from './component/Product';
@@ -11,6 +11,7 @@ import Contact from './component/Contact';
 import Report from './component/Report';
 import Login from './component/Login';
 import Signup from './component/Signup';
+import Profile from './component/Profile';
 import Recommend from './component/moreComponent/Recommend';
 import Rule from './component/moreComponent/Rule';
 import PrivacyPolicy from './component/moreComponent/PrivacyPolicy';
@@ -20,12 +21,13 @@ import Question from './component/moreComponent/Question';
 import Blog from './component/moreComponent/Blog';
 import AddProduct from './component/Product/AddProduct';
 import SignupCompany from './component/Company/SignupCompany';
+import ProductDetail from './component/Product/ProductDetail';
 
 
 function App() {
 
-  getUserInfor(); // user infor is save in sessionStorage with key: userInfor
-  getCompanyInfor(); 
+  setUserInfor(); // user infor is save in sessionStorage with key: userInfor
+  setCompanyInfor(); 
   
   return (
     <div className="App">
@@ -37,6 +39,7 @@ function App() {
         <Route exact path='/report' element={<Report />} />
         <Route exact path='/login' element={<Login />} />
         <Route exact path='/signup' element={<Signup />} />
+        <Route exact path='/profile/:id' element={<Profile />} />
 
         {/* more component */}
         <Route exact path='/recommend' element={<Recommend />} />
@@ -49,6 +52,7 @@ function App() {
 
         {/* add product */}
         <Route exact path='/product/addProduct' element={<AddProduct />} />
+        <Route exact path='/product/productDetail/:id' element={<ProductDetail />} />
 
         {/* add Company */}
         <Route exact path='/company/signupCompany' element={<SignupCompany />} />

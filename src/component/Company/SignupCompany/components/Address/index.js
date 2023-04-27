@@ -3,9 +3,25 @@ import './styles.css';
 
 import { AddressList } from '../../../../../utils/Common/AddressList.js';
 
+
+/**
+*@typedef {
+*Address_Id: string,
+*Address_Province: string,
+*Address_District: string,
+*Address_Commune: string,
+*Address_Hamlet: string,
+*Address_Home_Number: string,
+*Address_Company_User: bit,  --0: USER, 1: Company
+*Address_User_Id: string, 
+*Address_Company_Id: string
+*} AddressOptions
+*/
+
+
 const addressList = new AddressList();
 
-const Address = () => {
+const Address = ({setMyAddress}) => {
     const [ADDRESS_PROVINCE, set_ADDRESS_PROVINCE] = useState(['Chọn']);
     const [ADDRESS_District, set_ADDRESS_District] = useState(['Chọn']);
     const [ADDRESS_Commune, set_ADDRESS_Commune] = useState(['Chọn']);
@@ -13,9 +29,14 @@ const Address = () => {
     const [ADDRESS_Home_Number, set_ADDRESS_Home_Number] = useState(['Chọn']);
     const [textAddress, setTextAddress] = useState('');
     const addressString = useRef('');
+    const myAddress = useRef({});
 
     useMemo(() => {
+        myAddress.current.Address_Id = '';
         addressList.getProvince(data => set_ADDRESS_PROVINCE(pre => pre.concat(data)));
+
+        // stop complaining with comment:
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
     
@@ -29,28 +50,34 @@ const Address = () => {
         
         switch(type) {
             case 'province':
+                myAddress.current.Address_Province = condition;
                 addressList.getDistrict(condition, data => set_ADDRESS_District(pre => pre.concat(data)));
                 break;
 
             case 'district':
+                myAddress.current.Address_District = condition;
                 addressList.getCommune(condition, data => set_ADDRESS_Commune(pre => pre.concat(data)));
                 break;
 
             case 'commune':
+                myAddress.current.Address_Commune = condition;
                 addressList.getHamlet(condition, data => set_ADDRESS_Hamlet(pre => pre.concat(data)));
                 break;
 
             case 'hamlet':
+                myAddress.current.Address_Hamlet = condition;
                 addressList.getHome_Number(condition, data => set_ADDRESS_Home_Number(pre => pre.concat(data)));
                 break;
 
             case 'homeNumber':
+                myAddress.current.Address_Home_Number = condition;
                 setTextAddress(addressString.current);
+                setMyAddress(myAddress.current);
                 break;
 
             default:
                 throw new Error('Invalid parameter');
-          }
+        }
     }
 
     return (

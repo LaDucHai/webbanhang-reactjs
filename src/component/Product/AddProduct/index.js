@@ -65,8 +65,8 @@ const AddProduct = () => {
 
 
     useEffect(() => {
-        auto_addRows();
-        
+        // auto_addRows();
+
         return () => {
             //delete all Image URL (add product part)
             for (let i = 0; i < productImgsURL_1d.current.length; i++) {
@@ -78,17 +78,17 @@ const AddProduct = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    const auto_addRows = () => {
-        let textateaArr = ['textarea-des', 'textarea-infor']
-        for (let i = 0; i < textateaArr.length; i++) {
-            let textarea = document.getElementById(textateaArr[i]);
-            let limit = 1000; //height limit
-            textarea.oninput = function() {
-                textarea.style.height = "";
-                textarea.style.height = Math.min(textarea.scrollHeight, limit) + "px";
-            };
-        }
-    }
+    // const auto_addRows = () => {
+    //     let textateaArr = ['textarea-des', 'textarea-infor']
+    //     for (let i = 0; i < textateaArr.length; i++) {
+    //         let textarea = document.getElementById(textateaArr[i]);
+    //         let limit = 1000; //height limit
+    //         textarea.oninput = function() {
+    //             textarea.style.height = "";
+    //             textarea.style.height = Math.min(textarea.scrollHeight, limit) + "px";
+    //         };
+    //     }
+    // }
 
     // check login or not
     if (token !== null) {
@@ -230,6 +230,8 @@ const AddProduct = () => {
 
             // set array again
             productImgPaths.current = [];
+
+            alert('Thêm sản phẩm thành công');
         }
         
 
@@ -254,7 +256,7 @@ const AddProduct = () => {
 
     const storeProductImage = async (productImageOptions) => {
         try {
-            const res = await axios({
+            await axios({
                 method: 'post',
                 url: `${SERVERADDRESS}/product?type=productImage`,
                 headers: {
@@ -262,7 +264,6 @@ const AddProduct = () => {
                 }, 
                 data: productImageOptions
             })
-            console.log('storeProductImage', res.data)
         } catch (error) {
             console.error(error);
         }
@@ -304,10 +305,10 @@ const AddProduct = () => {
             });
             if (res.data.state) {
                 if (type === 'textarea-des') {
-                    describePath.current = res.data.data;
+                    describePath.current = SERVERADDRESS + `/text/${public_object}/` + res.data.data;
                 }
                 if (type === 'textarea-infor') {
-                    inforPath.current = res.data.data;
+                    inforPath.current = SERVERADDRESS + `/text/${public_object}/` + res.data.data;
                 }
             } else {
                 console.log('AddProduct uploadTxt', res.data);
@@ -321,10 +322,11 @@ const AddProduct = () => {
         if (checkisNaNNumber()) {
             const price = Number(document.getElementById('price').value);
             const sales = Number(document.getElementById('sale').value);
+            const amount = Number(document.getElementById('amount').value);
 
             VAT.current = (price - price*(sales/100))*(10/100);
 
-            setTotal(price - price*(sales/100) + VAT.current);
+            setTotal((price - price*(sales/100) + VAT.current)*amount);
         }
     }
 

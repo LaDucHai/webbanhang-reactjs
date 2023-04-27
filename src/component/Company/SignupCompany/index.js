@@ -4,7 +4,9 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 import Address from './components/Address';
+import { addAddress } from '../../../utils/Common/Addess';
 import { SERVERADDRESS, TOKENENCODESTRING } from '../../../utils/Constant';
+import { setCompanyInfor } from '../../../utils/Common';
 
 /** 
 *@typedef {
@@ -20,6 +22,20 @@ import { SERVERADDRESS, TOKENENCODESTRING } from '../../../utils/Constant';
 *} AddCompanyOptions, // as: InformationOptions
 */
 
+/**
+*@typedef {
+*Address_Id: string,
+*Address_Province: string,
+*Address_District: string,
+*Address_Commune: string,
+*Address_Hamlet: string,
+*Address_Home_Number: string,
+*Address_Company_User: bit,  --0: USER, 1: Company
+*Address_User_Id: string, 
+*Address_Company_Id: string
+*} AddressOptions
+*/
+
 
 const SignupCompany = () => {
     const public_object = 'Company';
@@ -33,6 +49,7 @@ const SignupCompany = () => {
     const describePath = useRef('');
     const inforPath = useRef('');
     const [signupState, setSignupState] = useState(false);
+    const [myAddress, setMyAddress] = useState({});
 
 
     const token = window.localStorage.getItem('token webbanhang');
@@ -88,23 +105,40 @@ const SignupCompany = () => {
                 Company_User_Id: userInfor.User_Id
             }
 
-            signupCompany(addCompanyOptions);
+
+            let company_Id;
+            await signupCompany(addCompanyOptions, (Company_Id) => company_Id = Company_Id);
+
+            let addressOptions = myAddress;
+            addressOptions.Address_Company_User = 1;
+            addressOptions.Address_User_Id = userInfor.User_Id;
+            addressOptions.Address_Company_Id = company_Id;
+
+            addAddress(addressOptions, () => {
+                setCompanyInfor();
+                setSignupState(true)
+            });
         } 
     }
 
-    const signupCompany = (addCompanyOptions) => {
-        axios({
-            method: 'post',
-            url: `${SERVERADDRESS}/company/signupCompany`,
-            headers: {
-                Authorization: `${TOKENENCODESTRING} ${token}`
-            },
-            data: addCompanyOptions
-        }).then(res => {
+    const signupCompany = async (addCompanyOptions, callback) => {
+        try {
+            const res = await axios({
+                method: 'post',
+                url: `${SERVERADDRESS}/company/signupCompany`,
+                headers: {
+                    Authorization: `${TOKENENCODESTRING} ${token}`
+                },
+                data: addCompanyOptions
+            })
             if (res.data.state) {
-                setSignupState(true);
+                callback(res.data.data.Company_Id);
+            } else {
+                alert('Tên công ty hoặc mã sô thuế bị trùng')
             }
-        }).catch(err => console.error(err))
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     const uploadImg = async (type, file) => {
@@ -148,10 +182,10 @@ const SignupCompany = () => {
             });
             if (res.data.state) {
                 if (type === 'textarea-des') {
-                    describePath.current = res.data.data;
+                    describePath.current = SERVERADDRESS + `/text/${public_object}/` + res.data.data;
                 }
                 if (type === 'textarea-infor') {
-                    inforPath.current = res.data.data;
+                    inforPath.current = SERVERADDRESS + `/text/${public_object}/` + res.data.data;
                 }
             } else {
                 console.log('SignupCompany uploadTxt', res.data);
@@ -219,7 +253,7 @@ const SignupCompany = () => {
                         <textarea className='signCompany-textarea' id='textarea-infor' onClick={() => inputClick('textarea-infor')} />
                     </div>
                     <div>
-                        <Address />
+                        <Address setMyAddress={setMyAddress}/>
                     </div>
                     <div>
                         <p></p>

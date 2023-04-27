@@ -1,5 +1,5 @@
-export const SERVERADDRESS = 'http://192.168.1.20:3000';
-// export const SERVERADDRESS = 'http://103.178.233.184:3000';
+export const SERVERADDRESS = 'http://192.168.1.26:4000';
+// export const SERVERADDRESS = 'http://103.178.233.184:4000';
 
 // encode token
 export const TOKENENCODESTRING = 'Bearer';
