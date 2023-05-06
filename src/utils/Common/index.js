@@ -4,20 +4,26 @@ import { SERVERADDRESS, TOKENENCODESTRING } from "../Constant";
 
 // get user infor
 export const setUserInfor = () => {
-    const token = window.localStorage.getItem('token webbanhang');
-    axios({
-        method: 'get',
-        url: `${SERVERADDRESS}/getUserInfor`,
-        headers: {
-            Authorization: `${TOKENENCODESTRING} ${token}`
-        }
-    }).then(res => {
-        if (res.data.state) {
-            window.sessionStorage.setItem('userInfor', JSON.stringify(res.data.data));
-        } else {
-            console.log('get user infor failure');
-        }
-    }).catch(err => console.error(err));
+    if (window.sessionStorage.getItem('userInfor') === null) {
+        const token = window.localStorage.getItem('token webbanhang');
+        axios({
+            method: 'get',
+            url: `${SERVERADDRESS}/getUserInfor`,
+            headers: {
+                Authorization: `${TOKENENCODESTRING} ${token}`
+            }
+        }).then(res => {
+            if (res.data.state) {
+                window.sessionStorage.setItem('userInfor', JSON.stringify(res.data.data));
+            } else {
+                console.log('get user infor failure');
+            }
+        }).catch(err => {
+            console.error(err);
+        }).finally(() => {
+            window.location.reload();
+        })
+    }
 }
 
 // get company infor

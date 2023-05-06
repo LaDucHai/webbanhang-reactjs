@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import { reduxStore } from '../../../../utils/redux';
 import { handleNumberString } from '../../../../utils/Common';
-import { SERVERADDRESS, TOKENENCODESTRING } from '../../../../utils/Constant';
+import { SERVERADDRESS, TOKENENCODESTRING, USERINFOR } from '../../../../utils/Constant';
 
 
 
@@ -18,6 +18,16 @@ import { SERVERADDRESS, TOKENENCODESTRING } from '../../../../utils/Constant';
 *Product_Id: string
 *} ProductLikeOptions
 */
+
+/**
+*@typedef {
+*Cart_Id: string,
+*Cart_Product_Id: string,
+*Cart_User_Id: string,
+*Cart_Type: string
+*} CartOptions
+*/
+    
 
 
 const ProductInforBlock = () => {
@@ -31,25 +41,31 @@ const ProductInforBlock = () => {
     const token = window.localStorage.getItem('token webbanhang');
     let userInfor = JSON.parse(window.sessionStorage.getItem('userInfor'));
 
-    const clickme = () => {
-        // axios({
-        //     method: 'get',
-        //     url: 'http://localhost:4000/text/Company/0a89d3d9-f55c-4147-8e3b-ee9c8d588e53-Mon%20Apr%2024%202023-aeda5465-407c-4621-8876-2b4260fd6a14.txt',
+    // const clickme = () => {
+    //     axios({
+    //         method: 'get',
+    //         url: 'http://localhost:4000/text/Company/0a89d3d9-f55c-4147-8e3b-ee9c8d588e53-Mon%20Apr%2024%202023-aeda5465-407c-4621-8876-2b4260fd6a14.txt',
 
-        // }).then(function (res) {
-        //     console.log(res.data)
+    //     }).then(function (res) {
+    //         console.log(res.data)
             
-        // });
-    }
+    //     });
+    // }
 
     useMemo(() => {
         reduxStore.subscribe(() => {
-            setImgIndex(0);
-            // console.log(reduxStore.getState())
-            setData(reduxStore.getState());
-            getLike(userInfor.User_Id, reduxStore.getState().Product_Id, product_LikeState => {
-                setLike(product_LikeState);
-            });
+            // console.log(reduxStore.getState());
+            if (reduxStore.getState().type === 'viewProduct-productBox-productInforBlock') {
+                setImgIndex(0);
+                setData(reduxStore.getState().data);
+
+                let token = window.localStorage.getItem('token webbanhang');
+                if (token !== null) {
+                    getLike(userInfor.User_Id, reduxStore.getState().data.Product_Id, product_LikeState => {
+                        setLike(product_LikeState);
+                    });
+                }
+            }  
         });
 
         // stop complaining with comment:
@@ -99,46 +115,73 @@ const ProductInforBlock = () => {
     } 
 
     const haneleLike = () => {
-        if (like) {
-            let productLikeOptions = {
-                User_Id: userInfor.User_Id,
-                Product_Id: data.Product_Id
-            }
-            axios({ 
-                method: 'post',
-                url: `${SERVERADDRESS}/product?type=disLikeProduct`,
-                headers: {
-                    Authorization: `${TOKENENCODESTRING} ${token}`
-                }, 
-                data: productLikeOptions
-            }).then(function (res) {
-                if (res.data.state) {
-                    setLike(false);
+        if (USERINFOR) {
+            if (like) {
+                let productLikeOptions = {
+                    User_Id: userInfor.User_Id,
+                    Product_Id: data.Product_Id
                 }
-            }).catch(err => console.error(err));
+                axios({ 
+                    method: 'post',
+                    url: `${SERVERADDRESS}/product?type=disLikeProduct`,
+                    headers: {
+                        Authorization: `${TOKENENCODESTRING} ${token}`
+                    }, 
+                    data: productLikeOptions
+                }).then(function (res) {
+                    if (res.data.state) {
+                        setLike(false);
+                    }
+                }).catch(err => console.error(err));
+            } else {
+                let productLikeOptions = {
+                    ProductLike_Id: '',
+                    User_Id: userInfor.User_Id,
+                    Product_Id: data.Product_Id
+                }
+                axios({ 
+                    method: 'post',
+                    url: `${SERVERADDRESS}/product?type=likeProduct`,
+                    headers: {
+                        Authorization: `${TOKENENCODESTRING} ${token}`
+                    }, 
+                    data: productLikeOptions
+                }).then(function (res) {
+                    if (res.data.state) {
+                        setLike(true);
+                    }
+                }).catch(err => console.error(err));
+            }
         } else {
-            let productLikeOptions = {
-                ProductLike_Id: '',
-                User_Id: userInfor.User_Id,
-                Product_Id: data.Product_Id
-            }
-            axios({ 
-                method: 'post',
-                url: `${SERVERADDRESS}/product?type=likeProduct`,
-                headers: {
-                    Authorization: `${TOKENENCODESTRING} ${token}`
-                }, 
-                data: productLikeOptions
-            }).then(function (res) {
-                if (res.data.state) {
-                    setLike(true);
-                }
-            }).catch(err => console.error(err));
+            alert('Bạn chưa đăng nhập');
         }
+        
     }
 
     const detailView = () => {
         navigate(`/product/productDetail/${data.Product_Id}`, { state: {data: data}});
+    }
+
+    const addCart = () => {
+        let cartOptions = {
+            Cart_Id: '',
+            Cart_Product_Id: data.Product_Id,
+            Cart_User_Id: userInfor.User_Id,
+            Cart_Type: 'cart'
+        }
+
+        axios({
+            method: 'post',
+            url: `${SERVERADDRESS}/cart?type=addCart`,
+            headers: {
+                Authorization: `Bearer ${token}`
+            }, 
+            data: cartOptions
+        }).then(res => {
+            if (res.data.state) {
+                reduxStore.dispatch({type: 'addCart', data: {}});
+            }
+        }).catch(err => console.error(err));
     }
 
     return (
@@ -197,12 +240,22 @@ const ProductInforBlock = () => {
                         <div>{`: ${total}`}</div>
                     </div>
                 </div>
-                <div className='ProductInforBlock-btn'>
-                    <div>
-                        <button onClick={() => clickme()}>Đặt hàng</button>
-                        <button onClick={() => detailView()}>Chi tiết</button>
+                {
+                    USERINFOR ?
+                    <div className='ProductInforBlock-btn'>
+                        <div>
+                            <button onClick={() => detailView()}>Đặt hàng</button>
+                            <button onClick={() => addCart()}>Thêm vào giỏ hàng</button>
+                            <button onClick={() => detailView()}>Chi tiết</button>
+                        </div>
+                    </div>:
+                    <div className='ProductInforBlock-btn'>
+                        <div>
+                            <button onClick={() => detailView()}>Chi tiết</button>
+                        </div>
                     </div>
-                </div>
+                }
+                
             </div>
         </div>
     )

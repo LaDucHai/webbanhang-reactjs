@@ -3,7 +3,13 @@ import { createStore } from 'redux';
 function counterReducer(state = null , action) {
     switch (action.type) {
         case 'viewProduct-productBox-productInforBlock':
-            return action.data;
+            return action;
+
+        case 'addCart':
+            return action;
+
+        case 'requireInbox':
+            return action;
         
         default:
             return state;

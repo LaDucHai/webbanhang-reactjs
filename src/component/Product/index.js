@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import './styles.css';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,7 @@ import { useMediaQuery } from 'react-responsive';
 import Header from '../../utils/Header';
 import ProductBlock from './detailComponents/ProductBlock';
 import ProductInforBlock from './detailComponents/ProductInforBlock';
+import ProductSearchBlock from './detailComponents/ProductSearchBlock';
 import { SERVERADDRESS, TOKENENCODESTRING } from '../../utils/Constant/index';
 import { Arr_1d_to_2d } from '../../utils/Common';
 
@@ -17,8 +18,11 @@ const Product = () => {
     // const [preValue, setPreValue] = useState("");
     const pageIndex = useRef(1);
     const remainState = useRef(true);
+    const [optionSearch, setOptionSearch] = useState({
+        type: 'product'
+    });
     
-    const pageSize = 16;
+    const pageSize = 20;
     const token = window.localStorage.getItem('token webbanhang');
 
     // respinsive /* samsung galaxy A51/71: 412px*/
@@ -27,10 +31,19 @@ const Product = () => {
     })
 
     const getProduct = async (pageIndex) => {
+        let url = '';
+        if (optionSearch.type === 'product') {
+            url = `${SERVERADDRESS}/product?type=${optionSearch.type}&pageIndex=${pageIndex}&pageSize=${pageSize}`;
+        } else if (optionSearch.type === 'productWithOptions'){
+            url = `${SERVERADDRESS}/product?type=${optionSearch.type}&pageIndex=${pageIndex}&pageSize=${pageSize}&productType=${optionSearch.productType}&productIndustry=${optionSearch.productIndustry}&productPrice1=${optionSearch.productPrice1}&productPrice2=${optionSearch.productPrice2}&productSale1=${optionSearch.productSale1}&productSale2=${optionSearch.productSale2}`
+        } else if (optionSearch.type === 'productWithSearch') {
+            url = `${SERVERADDRESS}/product?type=${optionSearch.type}&pageIndex=${pageIndex}&pageSize=${pageSize}&productName=${optionSearch.productName}`;
+        }
+
         try {
             const res = await axios({
                 method: 'get',
-                url: `${SERVERADDRESS}/product?type=product&pageIndex=${pageIndex}&pageSize=${pageSize}`,
+                url: url,
                 headers: {
                     Authorization: `${TOKENENCODESTRING} ${token}`
                 }
@@ -78,6 +91,14 @@ const Product = () => {
         setData(pre => pre.concat(arr_2d));
     }
 
+    useEffect(() => {
+        pageIndex.current = 1;
+        setData([]);
+        getData(pageIndex.current); 
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [optionSearch])
+
     useMemo(() => {
         getData(pageIndex.current);  
 
@@ -101,34 +122,13 @@ const Product = () => {
         )
     })
     
-
-    // const handleFile = (e) => {
-    //     const file = e.target.files[0];
-    //     console.log(file);
-    //     console.log(URL.createObjectURL(file));
-    // }
-
-    // const btnOnclick = () => {
-    //     axios({
-    //         method: 'post',
-    //         url: `${SERVERADDRESS}/testfile`,
-    //         data: {
-    //             data: textValue
-    //         }
-    //     }).then(res => {
-    //         console.log(res.data);
-    //     }).catch(err => console.error(err));
-    // }
-
-    // const btnOnclick1 = () => {
-    //     axios({
-    //         method: 'get',
-    //         url: `${SERVERADDRESS}/testfile`
-    //     }).then(res => {
-    //         console.log(res.data);
-    //         setPreValue(res.data.data);
-    //     }).catch(err => console.error(err));
-    // }
+    const handleSearch = () => {
+        setOptionSearch({
+            type: 'productWithSearch',
+            productName: document.getElementById('search').value
+        });
+    }
+   
 
     return (
         <div className="Product">
@@ -139,12 +139,18 @@ const Product = () => {
                 {
                     !isSamsungGalaxy ?
                     <div className='searchContainer'>
-                        <input className='input' id='search' placeholder='Tìm kiếm' />
+                        <div>
+                            <input className='input' id='search' placeholder='Tìm kiếm' />
+                            <div onClick={() => handleSearch()}>Tìm kiếm</div>
+                        </div>
                     </div>:<div></div>
                 }
                 <div className='productContainer'>
                     <div className='smartSearch'>
-                        <div>tim kiem nang cao</div>
+                        <div>
+                            <h4>Tìm kiếm tùy chọn</h4>
+                        </div>
+                        <ProductSearchBlock setOptionSearch={setOptionSearch}/>
                         <div>
                             <button><Link className='nav-link' to='/product/addProduct'>Thêm sản phẩm</Link></button>
                         </div>
@@ -153,12 +159,6 @@ const Product = () => {
                     { LoadMore }
                     </div>
                     <div className='detailProduct'>
-                        {/* <input type='file' onChange={(e) => handleFile(e)}/> */}
-                        {/* <textarea id='textarea' rows={9} onChange={() => setTextValue(document.getElementById('textarea').value)}></textarea>
-                        <pre>{preValue}</pre>
-                        <button onClick={() => btnOnclick()}>btn</button>
-                        <button onClick={() => btnOnclick1()}>btn1</button>
-                        <pre style={{width: '300px', backgroundColor: 'yellow'}}>{preValue}</pre> */}
                         <ProductInforBlock />
                     </div>
                 </div>

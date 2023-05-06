@@ -1,10 +1,13 @@
 //import logo from './logo.svg';
 import './App.css';
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { setUserInfor, setCompanyInfor } from './utils/Common/index';
+import { USERINFOR } from './utils/Constant';
 
+import MiniInboxContainer from './component/Inbox/MiniInboxContainer';
+// import MiniInboxBox from './component/Inbox/MiniInboxBox';
 import Home from './component/Home';
 import Product from './component/Product';
 import Contact from './component/Contact';
@@ -21,13 +24,15 @@ import Question from './component/moreComponent/Question';
 import Blog from './component/moreComponent/Blog';
 import AddProduct from './component/Product/AddProduct';
 import SignupCompany from './component/Company/SignupCompany';
-import ProductDetail from './component/Product/ProductDetail';
+import ProductDetail from './component/Product/detailComponents/ProductInforBlock/ProductDetail';
+
 
 
 function App() {
-
-  setUserInfor(); // user infor is save in sessionStorage with key: userInfor
-  setCompanyInfor(); 
+  useLayoutEffect(() => {
+    setUserInfor(); // user infor is save in sessionStorage with key: userInfor
+    setCompanyInfor(); 
+  }, [])
   
   return (
     <div className="App">
@@ -56,7 +61,8 @@ function App() {
 
         {/* add Company */}
         <Route exact path='/company/signupCompany' element={<SignupCompany />} />
-    </Routes>
+      </Routes>
+      {USERINFOR && <MiniInboxContainer />}
     </div>
   );
 }

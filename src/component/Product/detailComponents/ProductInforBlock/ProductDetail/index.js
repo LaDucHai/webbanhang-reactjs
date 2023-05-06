@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, memo } from 'react';
 import './styles.css';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-import { SERVERADDRESS, TOKENENCODESTRING } from '../../../utils/Constant';
+// import { SERVERADDRESS, TOKENENCODESTRING } from '../../../utils/Constant';
+import { SERVERADDRESS, TOKENENCODESTRING } from '../../../../../utils/Constant';
 import ProductDetailP from './ProductDetailP';
 import ProductDetailC from './ProductDetailC';
 import ProductDetailPay from './ProductDetailPay';
@@ -32,6 +33,7 @@ const ProductDetail = () => {
                 dataP_1.Product_Image = res.data.data[1].recordset;
                 setPData(dataP_1);
                 getC(dataP_1.Product_Company_Id);
+                // console.log(dataP_1.Product_Company_Id)
             }
             // console.log(res.data.data[1].recordset)
         }).catch(err => console.error(err))
@@ -47,6 +49,7 @@ const ProductDetail = () => {
         }).then(res => {
             if (res.data.state) {
                 setCData(res.data.data.recordset[0]);
+
             }
         }).catch(err => console.error(err))
     }
@@ -75,4 +78,4 @@ const ProductDetail = () => {
     )
 }
 
-export default ProductDetail;
+export default memo(ProductDetail);

@@ -3,6 +3,9 @@ import './styles.css';
 
 import { FiStar } from 'react-icons/fi';
 
+import { reduxStore } from '../../../../../../utils/redux';
+import { USERINFOR } from '../../../../../../utils/Constant';
+
 
 const ProductDetailC = ({onData}) => {
     const [startColor, setStartColor] = useState([]);
@@ -24,6 +27,13 @@ const ProductDetailC = ({onData}) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    const handleInboxRequire = () => {
+        USERINFOR !== null ? reduxStore.dispatch({ type: 'requireInbox', data: {
+            sender: USERINFOR.User_Id, 
+            receiver: onData.Company_User_Id
+        }}) : alert('Bạn chưa đăng nhập');
+    }
+
     return (
         <div className="ProductDetailC">
             <div className='ProductDetailC-header'>
@@ -38,7 +48,6 @@ const ProductDetailC = ({onData}) => {
                     <FiStar className='ProductDetailC-startIcon' color={startColor[3]} />
                     <FiStar className='ProductDetailC-startIcon' color={startColor[4]} />
                 </div>
-                
             </div>
             
             <div className="ProductDetailC-img">
@@ -50,6 +59,9 @@ const ProductDetailC = ({onData}) => {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className='ProductDetailC-inbox'>
+                <button onClick={() => handleInboxRequire()}>Nhắn tin</button>
             </div>
             <div>
                 <div>Thông tin</div>

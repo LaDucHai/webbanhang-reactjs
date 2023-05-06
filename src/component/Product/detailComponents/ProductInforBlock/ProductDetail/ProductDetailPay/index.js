@@ -3,7 +3,7 @@ import './styles.css';
 
 import QRCode from "react-qr-code";
 
-import { handleNumberString } from '../../../../utils/Common';
+import { handleNumberString } from '../../../../../../utils/Common';
 
 
 const carry = 10000;
